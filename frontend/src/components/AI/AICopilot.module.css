@@ -1,0 +1,197 @@
+.floatingButton {
+    position: fixed;
+    bottom: var(--space-xl);
+    right: var(--space-xl);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    border: none;
+    box-shadow: var(--shadow-xl), var(--shadow-glow);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-popover);
+    transition: all var(--transition-base);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.floatingButton:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-xl), 0 0 30px rgba(99, 102, 241, 0.5);
+}
+
+.icon {
+    font-size: var(--text-2xl);
+}
+
+.chatContainer {
+    position: fixed;
+    bottom: calc(var(--space-xl) + 80px);
+    right: var(--space-xl);
+    width: 400px;
+    max-height: 600px;
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    z-index: var(--z-popover);
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chatHeader {
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--border-primary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--gradient-primary);
+    border-top-left-radius: var(--radius-xl);
+    border-top-right-radius: var(--radius-xl);
+}
+
+.headerContent {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.headerIcon {
+    font-size: var(--text-2xl);
+}
+
+.headerTitle {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: white;
+}
+
+.headerSubtitle {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.closeButton {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.closeButton:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.chatBody {
+    flex: 1;
+    padding: var(--space-md);
+    overflow-y: auto;
+}
+
+.exampleMessages {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.exampleTitle {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--space-xs);
+}
+
+.exampleButton {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    text-align: left;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.exampleButton:hover {
+    background: var(--bg-hover);
+    border-color: var(--color-primary);
+    color: var(--text-primary);
+    transform: translateX(4px);
+}
+
+.chatFooter {
+    padding: var(--space-md);
+    border-top: 1px solid var(--border-primary);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.input {
+    width: 100%;
+    min-height: 80px;
+    resize: vertical;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+}
+
+.sendButton {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    transition: all var(--transition-base);
+}
+
+.sendButton:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.sendButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .chatContainer {
+        width: calc(100vw - var(--space-xl) * 2);
+        right: var(--space-md);
+    }
+
+    .floatingButton {
+        right: var(--space-md);
+    }
+}
