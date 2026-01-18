@@ -64,10 +64,26 @@ class SocketIONotificationService(INotificationService):
     """
     Servicio de notificaciones en tiempo real usando SocketIO.
     """
-    
+
     def __init__(self, socketio: SocketIO):
         self.socketio = socketio
-    
+
+    def send(self, user_id: str, message: str, notification_type: str = "info") -> None:
+        """
+        Envía una notificación genérica a un usuario.
+
+        Args:
+            user_id: ID del usuario destino
+            message: Mensaje de la notificación
+            notification_type: Tipo de notificación
+        """
+        self.socketio.emit('notification', {
+            'type': notification_type,
+            'title': 'Notificación',
+            'message': message,
+            'user_id': user_id
+        }, namespace='/')
+
     def notify_ticket_created(self, ticket: Ticket) -> None:
         """
         Notifica la creación de un ticket.

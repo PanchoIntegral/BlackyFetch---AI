@@ -3,7 +3,10 @@ BlackyFetch - OpenAI Adapter
 Implementación del puerto de IA usando OpenAI API.
 """
 from typing import Dict, Any, List, Optional
-import openai
+try:
+    import openai
+except ImportError:
+    openai = None
 import json
 
 from ...domain.models import Ticket, TicketPriority, TicketStatus
@@ -22,7 +25,11 @@ class OpenAIAdapter(IAIService):
             api_key: API Key de OpenAI
             model: Modelo a usar (default: gpt-4-turbo-preview)
         """
-        self.client = openai.OpenAI(api_key=api_key)
+        if openai:
+            self.client = openai.OpenAI(api_key=api_key)
+        else:
+            self.client = None
+            print("WARNING: OpenAI module not found. Using mock behavior.")
         self.model = model
     
     def parse_natural_language_to_ticket(

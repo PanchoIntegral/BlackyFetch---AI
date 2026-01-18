@@ -20,16 +20,18 @@ from src.infrastructure.adapters import (
 )
 
 # Importar servicios (Aplicación)
-from src.application import TicketService, AIService
+from src.application import TicketService, AIService, ProjectService
 
 # Importar controllers (Web)
 from src.infrastructure.web import (
     tickets_bp,
     webhooks_bp,
     dashboard_bp,
+    projects_bp,
     init_tickets_controller,
     init_webhooks_controller,
-    init_dashboard_controller
+    init_dashboard_controller,
+    init_projects_controller
 )
 
 
@@ -107,19 +109,30 @@ def create_app(config_name: str = None):
     )
     
     ai_service = AIService(ai_port=ai_adapter)
-    
+
+    # Servicio de proyectos
+    project_service = ProjectService(
+        project_repo=project_repo,
+        user_repo=user_repo,
+        ticket_repo=ticket_repo,
+        event_bus=event_bus,
+        notification_service=notification_service
+    )
+
     # ========================================================================
     # DEPENDENCY INJECTION - Controllers
     # ========================================================================
-    
+
     init_tickets_controller(ticket_service)
     init_webhooks_controller(ticket_service, config.GITHUB_WEBHOOK_SECRET)
     init_dashboard_controller(ticket_service, comment_repo)
+    init_projects_controller(project_service)
 
     # Registrar Blueprints
     app.register_blueprint(tickets_bp)
     app.register_blueprint(webhooks_bp)
     app.register_blueprint(dashboard_bp)
+    app.register_blueprint(projects_bp)
     
     # ========================================================================
     # SOCKETIO EVENTS

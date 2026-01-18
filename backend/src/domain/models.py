@@ -43,6 +43,12 @@ class PermissionType(Enum):
     ASSIGN = "assign"
 
 
+class ProjectMethodology(Enum):
+    """Metodologías de gestión de proyectos"""
+    SCRUM = "scrum"
+    KANBAN = "kanban"
+
+
 @dataclass
 class User:
     """
@@ -151,15 +157,18 @@ class Project:
     description: str = ""
     github_repo: Optional[str] = None
     slack_channel: Optional[str] = None
-    
+
     # Team
     owner_id: Optional[str] = None
     team_members: List[str] = field(default_factory=list)  # User IDs
-    
+
+    # Methodology
+    methodology: ProjectMethodology = ProjectMethodology.KANBAN
+
     # Settings
     auto_move_enabled: bool = True  # Git-Sync activo
     ai_assistant_enabled: bool = True
-    
+
     created_at: datetime = field(default_factory=datetime.utcnow)
     is_active: bool = True
 

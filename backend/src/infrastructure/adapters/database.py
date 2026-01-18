@@ -11,7 +11,7 @@ import uuid
 
 from ...domain.models import (
     Ticket, User, Project, Comment,
-    TicketStatus, TicketPriority, UserRole
+    TicketStatus, TicketPriority, UserRole, ProjectMethodology
 )
 from ...domain.ports import (
     ITicketRepository,
@@ -72,19 +72,21 @@ class UserORM(Base):
 class ProjectORM(Base):
     """Modelo ORM para Project"""
     __tablename__ = 'projects'
-    
+
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String(255), nullable=False)
     description = Column(Text)
     github_repo = Column(String(255))
     slack_channel = Column(String(100))
-    
+
     owner_id = Column(String(36))
     team_members = Column(JSON, default=list)
-    
+
+    methodology = Column(String(20), default='kanban')
+
     auto_move_enabled = Column(Boolean, default=True)
     ai_assistant_enabled = Column(Boolean, default=True)
-    
+
     created_at = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True)
 
@@ -313,6 +315,7 @@ class ProjectRepository(IProjectRepository):
             slack_channel=project.slack_channel,
             owner_id=project.owner_id,
             team_members=project.team_members,
+            methodology=project.methodology.value if project.methodology else 'kanban',
             auto_move_enabled=project.auto_move_enabled,
             ai_assistant_enabled=project.ai_assistant_enabled,
             created_at=project.created_at,
@@ -321,7 +324,7 @@ class ProjectRepository(IProjectRepository):
         self.session.add(orm)
         self.session.commit()
         return project
-    
+
     def get_by_id(self, project_id: str) -> Optional[Project]:
         orm = self.session.query(ProjectORM).filter(ProjectORM.id == project_id).first()
         if not orm:
@@ -334,12 +337,13 @@ class ProjectRepository(IProjectRepository):
             slack_channel=orm.slack_channel,
             owner_id=orm.owner_id,
             team_members=orm.team_members or [],
+            methodology=ProjectMethodology(orm.methodology) if orm.methodology else ProjectMethodology.KANBAN,
             auto_move_enabled=orm.auto_move_enabled,
             ai_assistant_enabled=orm.ai_assistant_enabled,
             created_at=orm.created_at,
             is_active=orm.is_active
         )
-    
+
     def get_all(self) -> List[Project]:
         orms = self.session.query(ProjectORM).filter(ProjectORM.is_active == True).all()
         return [Project(
@@ -350,25 +354,27 @@ class ProjectRepository(IProjectRepository):
             slack_channel=orm.slack_channel,
             owner_id=orm.owner_id,
             team_members=orm.team_members or [],
+            methodology=ProjectMethodology(orm.methodology) if orm.methodology else ProjectMethodology.KANBAN,
             auto_move_enabled=orm.auto_move_enabled,
             ai_assistant_enabled=orm.ai_assistant_enabled,
             created_at=orm.created_at,
             is_active=orm.is_active
         ) for orm in orms]
-    
+
     def update(self, project: Project) -> Project:
         orm = self.session.query(ProjectORM).filter(ProjectORM.id == project.id).first()
         if not orm:
             raise ValueError(f"Project {project.id} not found")
-        
+
         orm.name = project.name
         orm.description = project.description
         orm.github_repo = project.github_repo
         orm.slack_channel = project.slack_channel
         orm.team_members = project.team_members
+        orm.methodology = project.methodology.value if project.methodology else 'kanban'
         orm.auto_move_enabled = project.auto_move_enabled
         orm.ai_assistant_enabled = project.ai_assistant_enabled
-        
+
         self.session.commit()
         return project
 

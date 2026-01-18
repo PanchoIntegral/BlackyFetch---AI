@@ -61,6 +61,13 @@ export interface Ticket {
     original_message?: string;
 }
 
+export const ProjectMethodology = {
+    SCRUM: 'scrum',
+    KANBAN: 'kanban',
+} as const;
+
+export type ProjectMethodology = typeof ProjectMethodology[keyof typeof ProjectMethodology];
+
 export interface Project {
     id: string;
     name: string;
@@ -69,6 +76,7 @@ export interface Project {
     slack_channel?: string;
     owner_id?: string;
     team_members: string[];
+    methodology: ProjectMethodology;
     auto_move_enabled: boolean;
     ai_assistant_enabled: boolean;
     created_at: string;

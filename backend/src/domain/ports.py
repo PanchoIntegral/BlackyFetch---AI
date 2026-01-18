@@ -224,17 +224,22 @@ class ITeamsService(ABC):
 
 class INotificationService(ABC):
     """Puerto para sistema de notificaciones en tiempo real"""
-    
+
+    @abstractmethod
+    def send(self, user_id: str, message: str, notification_type: str = "info") -> None:
+        """Envía una notificación genérica a un usuario"""
+        pass
+
     @abstractmethod
     def notify_ticket_created(self, ticket: Ticket) -> None:
         """Notifica la creación de un ticket"""
         pass
-    
+
     @abstractmethod
     def notify_ticket_moved(self, ticket: Ticket, old_status: str, new_status: str) -> None:
         """Notifica el movimiento de un ticket"""
         pass
-    
+
     @abstractmethod
     def notify_ticket_assigned(self, ticket: Ticket, user: User) -> None:
         """Notifica la asignación de un ticket"""
