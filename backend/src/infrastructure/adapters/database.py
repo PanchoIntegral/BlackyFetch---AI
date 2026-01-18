@@ -374,6 +374,7 @@ class ProjectRepository(IProjectRepository):
         orm.methodology = project.methodology.value if project.methodology else 'kanban'
         orm.auto_move_enabled = project.auto_move_enabled
         orm.ai_assistant_enabled = project.ai_assistant_enabled
+        orm.is_active = project.is_active
 
         self.session.commit()
         return project

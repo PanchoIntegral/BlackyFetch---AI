@@ -30,7 +30,7 @@ class Config:
     REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
     
     # SocketIO
-    SOCKETIO_MESSAGE_QUEUE = os.getenv('SOCKETIO_MESSAGE_QUEUE', REDIS_URL)
+    SOCKETIO_MESSAGE_QUEUE = os.getenv('SOCKETIO_MESSAGE_QUEUE', None)
     SOCKETIO_CORS_ALLOWED_ORIGINS = os.getenv(
         'CORS_ORIGINS',
         'http://localhost:5173,http://localhost:3000'

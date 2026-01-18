@@ -191,10 +191,20 @@ def move_ticket(ticket_id: str):
         
         return jsonify({
             'id': ticket.id,
+            'title': ticket.title,
+            'description': ticket.description,
             'status': ticket.status.value,
+            'priority': ticket.priority.value,
+            'created_by': ticket.created_by,
+            'assigned_to': ticket.assigned_to,
+            'project_id': ticket.project_id,
+            'tags': ticket.tags,
+            'estimated_hours': ticket.estimated_hours,
+            'ai_generated': ticket.ai_generated,
+            'created_at': ticket.created_at.isoformat(),
             'updated_at': ticket.updated_at.isoformat()
         }), 200
-        
+
     except PermissionError as e:
         return jsonify({'error': str(e)}), 403
     except ValueError as e:

@@ -119,6 +119,7 @@ class Ticket:
     created_at: datetime = field(default_factory=datetime.utcnow)
     updated_at: datetime = field(default_factory=datetime.utcnow)
     
+    
     # IA Metadata
     ai_generated: bool = False
     original_message: Optional[str] = None  # Mensaje original de Slack/Teams

@@ -25,12 +25,24 @@ def create_sample_data():
     """Crea datos de ejemplo para desarrollo"""
     config = get_config()
     db_factory = DatabaseFactory(config.SQLALCHEMY_DATABASE_URI)
-    
+
     user_repo = db_factory.get_user_repository()
     project_repo = db_factory.get_project_repository()
-    
+
     print("👤 Creando usuarios de ejemplo...")
-    
+
+    # Crear usuario mock del frontend (user-123)
+    # Este usuario es usado por el frontend en desarrollo
+    mock_user = User(
+        id="user-123",
+        email="developer@blackyfetch.com",
+        username="Developer",
+        role=UserRole.BUILDER,
+        github_username="dev_github"
+    )
+    mock_user = user_repo.create(mock_user)
+    print(f"   ✓ Mock user creado: {mock_user.email} (ID: {mock_user.id})")
+
     # Crear usuarios
     admin = User(
         email="admin@blackyfetch.com",
@@ -67,7 +79,7 @@ def create_sample_data():
         github_repo="blackyfetch/demo",
         slack_channel="#blackyfetch-demo",
         owner_id=admin.id,
-        team_members=[admin.id, developer.id, stakeholder.id],
+        team_members=[mock_user.id, admin.id, developer.id, stakeholder.id],
         auto_move_enabled=True,
         ai_assistant_enabled=True
     )
@@ -78,6 +90,7 @@ def create_sample_data():
     print("✅ Datos de ejemplo creados exitosamente")
     print("=" * 60)
     print(f"\n📝 Información útil:")
+    print(f"   Mock User ID: {mock_user.id} (usado por el frontend)")
     print(f"   Admin ID: {admin.id}")
     print(f"   Developer ID: {developer.id}")
     print(f"   Project ID: {project.id}")
