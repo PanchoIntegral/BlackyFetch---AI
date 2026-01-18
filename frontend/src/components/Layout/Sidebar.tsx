@@ -5,7 +5,6 @@ import { getInitials } from '../../utils/helpers';
 import {
     LayoutDashboard,
     FolderKanban,
-    Columns3,
     Calendar,
     BarChart3,
     Settings,
@@ -66,7 +65,7 @@ export const Sidebar: React.FC = () => {
                 </div>
                 <NavItem to="/dashboard" icon={<LayoutDashboard size={20} strokeWidth={1.5} />} label="Dashboard" />
                 <NavItem to="/projects" icon={<FolderKanban size={20} strokeWidth={1.5} />} label="Projects" />
-                <NavItem to="/board" icon={<Columns3 size={20} strokeWidth={1.5} />} label="Kanban Board" />
+
                 <NavItem to="/calendar" icon={<Calendar size={20} strokeWidth={1.5} />} label="Calendar" />
                 <NavItem to="/reports" icon={<BarChart3 size={20} strokeWidth={1.5} />} label="Reports" />
 
@@ -81,10 +80,9 @@ export const Sidebar: React.FC = () => {
                         <NavLink
                             to="/settings/methodology"
                             className={({ isActive }) =>
-                                `flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                                    isActive
-                                        ? 'text-primary-600 dark:text-primary-400 font-medium'
-                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                                `flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-200 ${isActive
+                                    ? 'text-primary-600 dark:text-primary-400 font-medium'
+                                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                                 }`
                             }
                         >
@@ -94,10 +92,9 @@ export const Sidebar: React.FC = () => {
                         <NavLink
                             to="/settings/team"
                             className={({ isActive }) =>
-                                `flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                                    isActive
-                                        ? 'text-primary-600 dark:text-primary-400 font-medium'
-                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                                `flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-200 ${isActive
+                                    ? 'text-primary-600 dark:text-primary-400 font-medium'
+                                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                                 }`
                             }
                         >
@@ -107,10 +104,9 @@ export const Sidebar: React.FC = () => {
                         <NavLink
                             to="/settings/integrations"
                             className={({ isActive }) =>
-                                `flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                                    isActive
-                                        ? 'text-primary-600 dark:text-primary-400 font-medium'
-                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                                `flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-200 ${isActive
+                                    ? 'text-primary-600 dark:text-primary-400 font-medium'
+                                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                                 }`
                             }
                         >

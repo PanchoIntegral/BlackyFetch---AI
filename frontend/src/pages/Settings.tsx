@@ -15,45 +15,14 @@ import {
     Shield
 } from 'lucide-react';
 
-type Methodology = 'kanban' | 'scrum' | 'custom';
-
-interface MethodologyConfig {
-    kanban: {
-        wipLimit: number;
-        cycleTimeTracking: boolean;
-    };
-    scrum: {
-        sprintDuration: string;
-        backlogGrooming: boolean;
-    };
-    custom: {
-        customStatuses: boolean;
-        rolePermissions: boolean;
-        automationRules: boolean;
-    };
-}
+import { useSettings, type Methodology } from '../contexts/SettingsContext';
 
 const MethodologySettings: React.FC = () => {
-    const [selectedMethodology, setSelectedMethodology] = useState<Methodology>('scrum');
-    const [config, setConfig] = useState<MethodologyConfig>({
-        kanban: {
-            wipLimit: 5,
-            cycleTimeTracking: true,
-        },
-        scrum: {
-            sprintDuration: '2_weeks',
-            backlogGrooming: true,
-        },
-        custom: {
-            customStatuses: false,
-            rolePermissions: false,
-            automationRules: false,
-        },
-    });
+    const { selectedMethodology, config, setMethodology, updateConfig } = useSettings();
     const [showExperimental, setShowExperimental] = useState(false);
 
-    const handleSelectMethodology = (methodology: Methodology) => {
-        setSelectedMethodology(methodology);
+    const handleSelectMethodology = (methodology: any) => {
+        setMethodology(methodology);
     };
 
     const MethodologyCard = ({
@@ -74,11 +43,10 @@ const MethodologySettings: React.FC = () => {
         children?: React.ReactNode;
     }) => (
         <div
-            className={`relative p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer group ${
-                isSelected
-                    ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-900/10 shadow-lg shadow-primary-500/10'
-                    : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-dark-card hover:border-gray-300 dark:hover:border-gray-600'
-            }`}
+            className={`relative p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer group ${isSelected
+                ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-900/10 shadow-lg shadow-primary-500/10'
+                : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-dark-card hover:border-gray-300 dark:hover:border-gray-600'
+                }`}
             onClick={() => handleSelectMethodology(type)}
         >
             {/* Active indicator */}
@@ -90,35 +58,31 @@ const MethodologySettings: React.FC = () => {
 
             {/* Badge */}
             <div className="flex items-start justify-between mb-4">
-                <div className={`p-3 rounded-xl ${
-                    isSelected
-                        ? 'bg-primary-100 dark:bg-primary-900/30'
-                        : 'bg-gray-100 dark:bg-gray-800'
-                }`}>
+                <div className={`p-3 rounded-xl ${isSelected
+                    ? 'bg-primary-100 dark:bg-primary-900/30'
+                    : 'bg-gray-100 dark:bg-gray-800'
+                    }`}>
                     <Icon
-                        className={`w-6 h-6 ${
-                            isSelected
-                                ? 'text-primary-600 dark:text-primary-400'
-                                : 'text-gray-500 dark:text-gray-400'
-                        }`}
+                        className={`w-6 h-6 ${isSelected
+                            ? 'text-primary-600 dark:text-primary-400'
+                            : 'text-gray-500 dark:text-gray-400'
+                            }`}
                         strokeWidth={1.5}
                     />
                 </div>
-                <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${
-                    isSelected
-                        ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
-                        : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
-                }`}>
+                <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${isSelected
+                    ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
+                    : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                    }`}>
                     {badge}
                 </span>
             </div>
 
             {/* Title and description */}
-            <h3 className={`text-lg font-bold mb-2 ${
-                isSelected
-                    ? 'text-gray-900 dark:text-white'
-                    : 'text-gray-700 dark:text-gray-300'
-            }`}>
+            <h3 className={`text-lg font-bold mb-2 ${isSelected
+                ? 'text-gray-900 dark:text-white'
+                : 'text-gray-700 dark:text-gray-300'
+                }`}>
                 {title}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
@@ -130,11 +94,10 @@ const MethodologySettings: React.FC = () => {
 
             {/* Selection button */}
             <button
-                className={`w-full mt-4 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-                    isSelected
-                        ? 'bg-primary-500 text-white hover:bg-primary-600'
-                        : 'border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
-                }`}
+                className={`w-full mt-4 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${isSelected
+                    ? 'bg-primary-500 text-white hover:bg-primary-600'
+                    : 'border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                    }`}
             >
                 {isSelected ? (
                     <>
@@ -178,7 +141,7 @@ const MethodologySettings: React.FC = () => {
                                 type="number"
                                 value={config.kanban.wipLimit}
                                 onChange={(e) =>
-                                    setConfig({
+                                    updateConfig({
                                         ...config,
                                         kanban: { ...config.kanban, wipLimit: parseInt(e.target.value) || 0 },
                                     })
@@ -194,21 +157,19 @@ const MethodologySettings: React.FC = () => {
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    setConfig({
+                                    updateConfig({
                                         ...config,
                                         kanban: { ...config.kanban, cycleTimeTracking: !config.kanban.cycleTimeTracking },
                                     });
                                 }}
-                                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
-                                    config.kanban.cycleTimeTracking
-                                        ? 'bg-primary-500'
-                                        : 'bg-gray-200 dark:bg-gray-700'
-                                }`}
+                                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${config.kanban.cycleTimeTracking
+                                    ? 'bg-primary-500'
+                                    : 'bg-gray-200 dark:bg-gray-700'
+                                    }`}
                             >
                                 <span
-                                    className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${
-                                        config.kanban.cycleTimeTracking ? 'translate-x-5' : ''
-                                    }`}
+                                    className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${config.kanban.cycleTimeTracking ? 'translate-x-5' : ''
+                                        }`}
                                 />
                             </button>
                         </div>
@@ -233,7 +194,7 @@ const MethodologySettings: React.FC = () => {
                                 <select
                                     value={config.scrum.sprintDuration}
                                     onChange={(e) =>
-                                        setConfig({
+                                        updateConfig({
                                             ...config,
                                             scrum: { ...config.scrum, sprintDuration: e.target.value },
                                         })
@@ -257,21 +218,19 @@ const MethodologySettings: React.FC = () => {
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    setConfig({
+                                    updateConfig({
                                         ...config,
                                         scrum: { ...config.scrum, backlogGrooming: !config.scrum.backlogGrooming },
                                     });
                                 }}
-                                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
-                                    config.scrum.backlogGrooming
-                                        ? 'bg-primary-500'
-                                        : 'bg-gray-200 dark:bg-gray-700'
-                                }`}
+                                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${config.scrum.backlogGrooming
+                                    ? 'bg-primary-500'
+                                    : 'bg-gray-200 dark:bg-gray-700'
+                                    }`}
                             >
                                 <span
-                                    className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${
-                                        config.scrum.backlogGrooming ? 'translate-x-5' : ''
-                                    }`}
+                                    className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${config.scrum.backlogGrooming ? 'translate-x-5' : ''
+                                        }`}
                                 />
                             </button>
                         </div>
@@ -331,9 +290,8 @@ const MethodologySettings: React.FC = () => {
                         </div>
                     </div>
                     <ChevronDown
-                        className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
-                            showExperimental ? 'rotate-180' : ''
-                        }`}
+                        className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${showExperimental ? 'rotate-180' : ''
+                            }`}
                     />
                 </button>
 
@@ -421,10 +379,9 @@ export const Settings: React.FC = () => {
                                 key={item.to}
                                 to={item.to}
                                 className={({ isActive }) =>
-                                    `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                                        isActive
-                                            ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-300'
-                                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                    `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
+                                        ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-300'
+                                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                                     }`
                                 }
                             >

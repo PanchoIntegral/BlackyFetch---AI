@@ -1,12 +1,8 @@
-import React, { useState } from 'react';
+import { useSettings } from '../../contexts/SettingsContext';
+
+import React, { useState, useEffect } from 'react';
 import { X, Folder, Github, Hash, Bot, GitBranch, Loader2, LayoutGrid, Repeat } from 'lucide-react';
 import type { ProjectMethodology } from '../../types';
-
-interface CreateProjectModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onSubmit: (data: ProjectFormData) => Promise<void>;
-}
 
 export interface ProjectFormData {
     name: string;
@@ -18,22 +14,59 @@ export interface ProjectFormData {
     ai_assistant_enabled: boolean;
 }
 
+interface CreateProjectModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onSubmit: (data: ProjectFormData) => Promise<void>;
+    initialData?: ProjectFormData;
+    isEditing?: boolean;
+}
+
 export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
     isOpen,
     onClose,
-    onSubmit
+    onSubmit,
+    initialData,
+    isEditing = false
 }) => {
+    const { selectedMethodology, config } = useSettings();
     const [formData, setFormData] = useState<ProjectFormData>({
         name: '',
         description: '',
         github_repo: '',
         slack_channel: '',
-        methodology: 'kanban',
+        methodology: 'kanban', // Will be updated in useEffect
         auto_move_enabled: true,
         ai_assistant_enabled: true
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (isOpen) {
+            if (initialData) {
+                setFormData({
+                    name: initialData.name || '',
+                    description: initialData.description || '',
+                    github_repo: initialData.github_repo || '',
+                    slack_channel: initialData.slack_channel || '',
+                    methodology: initialData.methodology || 'kanban',
+                    auto_move_enabled: initialData.auto_move_enabled ?? true,
+                    ai_assistant_enabled: initialData.ai_assistant_enabled ?? true
+                });
+            } else {
+                setFormData({
+                    name: '',
+                    description: '',
+                    github_repo: '',
+                    slack_channel: '',
+                    methodology: selectedMethodology as ProjectMethodology || 'kanban',
+                    auto_move_enabled: true,
+                    ai_assistant_enabled: true
+                });
+            }
+        }
+    }, [isOpen, initialData, selectedMethodology]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -96,7 +129,7 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                             <Folder className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                         </div>
                         <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                            Crear Nuevo Proyecto
+                            {isEditing ? 'Modificar Proyecto' : 'Crear Nuevo Proyecto'}
                         </h2>
                     </div>
                     <button
@@ -154,11 +187,10 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                         </label>
                         <div className="grid grid-cols-2 gap-3">
                             <label
-                                className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                                    formData.methodology === 'kanban'
-                                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                                }`}
+                                className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${formData.methodology === 'kanban'
+                                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                                    }`}
                             >
                                 <input
                                     type="radio"
@@ -168,29 +200,28 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                                     onChange={handleChange}
                                     className="sr-only"
                                 />
-                                <div className={`p-2 rounded-lg ${
-                                    formData.methodology === 'kanban'
-                                        ? 'bg-primary-500 text-white'
-                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
-                                }`}>
+                                <div className={`p-2 rounded-lg ${formData.methodology === 'kanban'
+                                    ? 'bg-primary-500 text-white'
+                                    : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
+                                    }`}>
                                     <LayoutGrid className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className={`font-medium ${
-                                        formData.methodology === 'kanban'
-                                            ? 'text-primary-700 dark:text-primary-300'
-                                            : 'text-gray-900 dark:text-white'
-                                    }`}>Kanban</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">Flujo continuo</p>
+                                    <p className={`font-medium ${formData.methodology === 'kanban'
+                                        ? 'text-primary-700 dark:text-primary-300'
+                                        : 'text-gray-900 dark:text-white'
+                                        }`}>Kanban</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        Limit: {config.kanban.wipLimit} tasks | {config.kanban.cycleTimeTracking ? 'Cycle Time On' : 'Cycle Time Off'}
+                                    </p>
                                 </div>
                             </label>
 
                             <label
-                                className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                                    formData.methodology === 'scrum'
-                                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                                }`}
+                                className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${formData.methodology === 'scrum'
+                                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                                    }`}
                             >
                                 <input
                                     type="radio"
@@ -200,20 +231,20 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                                     onChange={handleChange}
                                     className="sr-only"
                                 />
-                                <div className={`p-2 rounded-lg ${
-                                    formData.methodology === 'scrum'
-                                        ? 'bg-primary-500 text-white'
-                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
-                                }`}>
+                                <div className={`p-2 rounded-lg ${formData.methodology === 'scrum'
+                                    ? 'bg-primary-500 text-white'
+                                    : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
+                                    }`}>
                                     <Repeat className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className={`font-medium ${
-                                        formData.methodology === 'scrum'
-                                            ? 'text-primary-700 dark:text-primary-300'
-                                            : 'text-gray-900 dark:text-white'
-                                    }`}>Scrum</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">Sprints iterativos</p>
+                                    <p className={`font-medium ${formData.methodology === 'scrum'
+                                        ? 'text-primary-700 dark:text-primary-300'
+                                        : 'text-gray-900 dark:text-white'
+                                        }`}>Scrum</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        Sprint: {config.scrum.sprintDuration.replace('_', ' ')} | {config.scrum.backlogGrooming ? 'Grooming On' : 'Grooming Off'}
+                                    </p>
                                 </div>
                             </label>
                         </div>
@@ -310,10 +341,10 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                             {loading ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                    Creando...
+                                    {isEditing ? 'Guardando...' : 'Creando...'}
                                 </>
                             ) : (
-                                'Crear Proyecto'
+                                isEditing ? 'Guardar Cambios' : 'Crear Proyecto'
                             )}
                         </button>
                     </div>

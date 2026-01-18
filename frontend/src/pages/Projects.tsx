@@ -40,13 +40,14 @@ const generateTeamAvatars = (teamMembers: string[], ownerId?: string) => {
 export const Projects: React.FC = () => {
     const [activeTab, setActiveTab] = useState<Tab>('owned');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingProject, setEditingProject] = useState<ProjectWithStats | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
     const { user } = useAuth();
 
     // Usar el hook de proyectos con el ID del usuario actual
     const userId = user?.id || 'dev-user-001';
-    const { projects, loading, error, createProject, refresh } = useProjects(userId);
+    const { projects, loading, error, createProject, updateProject, archiveProject, refresh } = useProjects(userId);
 
     // Mapear proyectos del API al formato del componente
     const mapProjectToCard = (project: ProjectWithStats) => ({
@@ -76,14 +77,44 @@ export const Projects: React.FC = () => {
     const invitedProjects = filterProjects(projects.invited).map(mapProjectToCard);
     const archivedProjects = filterProjects(projects.archived).map(mapProjectToCard);
 
-    // Handler para crear proyecto
-    const handleCreateProject = async (data: ProjectFormData) => {
-        await createProject(data);
+    // Handler para crear o actualizar proyecto
+    const handleSaveProject = async (data: ProjectFormData) => {
+        if (editingProject) {
+            await updateProject(editingProject.id, data);
+        } else {
+            await createProject(data);
+        }
+        setIsModalOpen(false);
+        setEditingProject(null);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setEditingProject(null);
     };
 
     // Handler para navegar al board del proyecto
     const handleProjectClick = (projectId: string) => {
         navigate(`/board?project=${projectId}`);
+    };
+
+    // Handler para eliminar (archivar) proyecto
+    const handleDeleteProject = async (projectId: string) => {
+        if (window.confirm('¿Estás seguro de querer eliminar este proyecto?')) {
+            try {
+                console.log('Attempting to delete project:', projectId);
+                await archiveProject(projectId);
+                console.log('Project deleted successfully');
+            } catch (err) {
+                console.error('Failed to delete project:', err);
+                alert(`Error deleting project: ${err instanceof Error ? err.message : String(err)}`);
+            }
+        }
+    };
+
+    const handleEditProject = (project: ProjectWithStats) => {
+        setEditingProject(project);
+        setIsModalOpen(true);
     };
 
     return (
@@ -196,9 +227,11 @@ export const Projects: React.FC = () => {
                                     key={project.id}
                                     {...project}
                                     onClick={() => handleProjectClick(project.id)}
+                                    onEdit={() => handleEditProject({ ...project, progress: 0, ticket_count: 0, team_size: 0 } as any)}
+                                    onDelete={() => handleDeleteProject(project.id)}
                                 />
                             ))}
-                            <NewProjectCard onClick={() => setIsModalOpen(true)} />
+                            <NewProjectCard onClick={() => { setEditingProject(null); setIsModalOpen(true); }} />
                         </>
                     )}
 
@@ -228,6 +261,7 @@ export const Projects: React.FC = () => {
                                         key={project.id}
                                         {...project}
                                         onClick={() => handleProjectClick(project.id)}
+                                        onDelete={() => handleDeleteProject(project.id)}
                                     />
                                 ))
                             ) : (
@@ -243,8 +277,18 @@ export const Projects: React.FC = () => {
             {/* Create Project Modal */}
             <CreateProjectModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSubmit={handleCreateProject}
+                onClose={handleCloseModal}
+                onSubmit={handleSaveProject}
+                initialData={editingProject ? {
+                    name: editingProject.name,
+                    description: editingProject.description,
+                    github_repo: editingProject.github_repo,
+                    slack_channel: editingProject.slack_channel,
+                    methodology: (editingProject.methodology as any) || 'kanban',
+                    auto_move_enabled: editingProject.auto_move_enabled ?? true,
+                    ai_assistant_enabled: editingProject.ai_assistant_enabled ?? true
+                } : undefined}
+                isEditing={!!editingProject}
             />
         </div>
     );

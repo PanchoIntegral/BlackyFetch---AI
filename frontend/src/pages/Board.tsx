@@ -5,7 +5,7 @@ import { useTickets } from '../hooks/useTickets';
 import { useProject } from '../hooks/useProjects';
 import { TicketBoard } from '../components/Ticket/TicketBoard';
 import { AICopilot } from '../components/AI/AICopilot';
-import { Loader2, AlertCircle, ArrowLeft, LayoutGrid, Repeat } from 'lucide-react';
+import { Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 import type { Ticket, TicketStatus } from '../types';
 
 export const Board: React.FC = () => {
@@ -121,18 +121,7 @@ export const Board: React.FC = () => {
                                 {project.name}
                             </h1>
                             {/* Methodology badge */}
-                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                                project.methodology === 'scrum'
-                                    ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
-                                    : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-                            }`}>
-                                {project.methodology === 'scrum' ? (
-                                    <Repeat className="w-3 h-3" />
-                                ) : (
-                                    <LayoutGrid className="w-3 h-3" />
-                                )}
-                                {project.methodology === 'scrum' ? 'Scrum' : 'Kanban'}
-                            </span>
+
                         </div>
                         <p className="text-gray-500 dark:text-gray-400 text-sm">
                             {project.description || 'Sin descripción'}
@@ -173,25 +162,13 @@ export const Board: React.FC = () => {
 
             {/* Board */}
             <div className="flex-1 min-h-0">
-                {tickets.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full text-center">
-                        <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
-                            <LayoutGrid className="w-8 h-8 text-gray-400" />
-                        </div>
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                            No hay tickets aún
-                        </h3>
-                        <p className="text-gray-500 dark:text-gray-400 mb-4 max-w-md">
-                            Usa el AI Copilot en la esquina inferior derecha para crear tu primer ticket con lenguaje natural.
-                        </p>
-                    </div>
-                ) : (
-                    <TicketBoard
-                        tickets={tickets}
-                        onMoveTicket={handleMoveTicket}
-                        onTicketClick={handleTicketClick}
-                    />
-                )}
+                <TicketBoard
+                    tickets={tickets}
+                    onMoveTicket={handleMoveTicket}
+                    onTicketClick={handleTicketClick}
+                    onCreateTicket={handleTicketCreated}
+                    projectId={projectId || ''}
+                />
             </div>
 
             {/* AI Copilot */}

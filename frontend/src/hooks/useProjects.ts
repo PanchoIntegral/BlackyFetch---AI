@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { projectApi } from '../api/projects';
-import type { ProjectWithStats, UserProjectsResponse, CreateProjectRequest } from '../api/projects';
+import type { ProjectWithStats, UserProjectsResponse, CreateProjectRequest, UpdateProjectRequest } from '../api/projects';
 
 interface UseProjectsResult {
     projects: UserProjectsResponse;
     loading: boolean;
     error: string | null;
     createProject: (data: Omit<CreateProjectRequest, 'owner_id'>) => Promise<void>;
+    updateProject: (projectId: string, data: Omit<UpdateProjectRequest, 'user_id'>) => Promise<void>;
     archiveProject: (projectId: string) => Promise<void>;
     refresh: () => Promise<void>;
 }
@@ -63,10 +64,28 @@ export function useProjects(userId: string): UseProjectsResult {
         }
     }, [userId, fetchProjects]);
 
-    const archiveProject = useCallback(async (projectId: string) => {
+    const updateProject = useCallback(async (projectId: string, data: Omit<UpdateProjectRequest, 'user_id'>) => {
         try {
             setError(null);
+            await projectApi.updateProject(projectId, {
+                ...data,
+                user_id: userId
+            });
+            await fetchProjects();
+        } catch (err) {
+            console.error('Error updating project:', err);
+            const message = err instanceof Error ? err.message : 'Error al actualizar proyecto';
+            setError(message);
+            throw new Error(message);
+        }
+    }, [userId, fetchProjects]);
+
+    const archiveProject = useCallback(async (projectId: string) => {
+        try {
+            console.log('useProjects: archiving project', projectId, 'userId:', userId);
+            setError(null);
             await projectApi.archiveProject(projectId, userId);
+            console.log('useProjects: archived, refreshing...');
             // Refrescar la lista después de archivar
             await fetchProjects();
         } catch (err) {
@@ -82,6 +101,7 @@ export function useProjects(userId: string): UseProjectsResult {
         loading,
         error,
         createProject,
+        updateProject,
         archiveProject,
         refresh: fetchProjects
     };
